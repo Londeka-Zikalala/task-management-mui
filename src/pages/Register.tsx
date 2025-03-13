@@ -12,7 +12,7 @@ const Register = () => {
 
   const handleRegister = async () => {
     try {
-      const response = await axios.post("http://localhost:3011/register", { username, password });
+      const response = await axios.post("https://task-management-nest.onrender.com", { username, password });
       alert(response.data);
     } catch (error) {
       alert("Registration failed");

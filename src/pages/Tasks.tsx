@@ -13,7 +13,7 @@ const Tasks = () => {
     if (!user) return;
     const fetchTasks = async () => {
       try {
-        const response = await axios.get<Task[]>(`http://localhost:3011/${user.id}/tasks`);
+        const response = await axios.get<Task[]>(`https://task-management-nest.onrender.com/${user.id}/tasks`);
         setTasks(response.data);
       } catch (error) {
         console.error("Error fetching tasks");
