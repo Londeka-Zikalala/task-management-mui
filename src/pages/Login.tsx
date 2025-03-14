@@ -14,7 +14,7 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post<User | null>("https://task-management-nest.onrender.com", { username, password });
+      const response = await axios.post<User | null>("/api/login", { username, password });
       if (response.data) {
         login(response.data);
         navigate("/tasks");
