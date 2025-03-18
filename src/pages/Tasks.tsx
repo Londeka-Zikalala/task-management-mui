@@ -13,7 +13,7 @@ const Tasks = () => {
     if (!user) return;
     const fetchTasks = async () => {
       try {
-        const response = await axios.get<Task[]>(`/api/${user.id}/tasks`);
+        const response = await axios.get<Task[]>(`https://task-management-nest.onrender.com/${user.id}/tasks`);
         setTasks(response.data);
       } catch (error) {
         console.error("Error fetching tasks");
@@ -24,7 +24,7 @@ const Tasks = () => {
 
   const handleAddTask = async () => {
     try {
-      const response = await axios.post('/api/tasks/create', {
+      const response = await axios.post('https://task-management-nest.onrender.com/tasks/create', {
         title: newTask.title,
         description: newTask.description,
         due_date: new Date().toISOString(), 
@@ -41,7 +41,7 @@ const Tasks = () => {
 
   const handleDeleteTask = async (title: string) => {
     try {
-      await axios.delete('/api/tasks/delete', { data: { title } });
+      await axios.delete('https://task-management-nest.onrender.com/tasks/delete', { data: { title } });
       setTasks(tasks.filter(task => task.title !== title));
     } catch (error) {
       console.error("Error deleting task");

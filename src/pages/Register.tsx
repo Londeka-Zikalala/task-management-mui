@@ -11,7 +11,7 @@ const Register = () => {
 
   const handleRegister = async () => {
     try {
-      const response = await axios.post<{ user: User, token: string }>("/api/register", { username, password });
+      const response = await axios.post<{ user: User, token: string }>("https://task-management-nest.onrender.com/register", { username, password });
       if (response.data && response.data.token) {
         login(response.data.user, response.data.token); 
         alert("Registration successful, logging in...");
