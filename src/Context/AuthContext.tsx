@@ -1,9 +1,9 @@
-import { createContext, useState, ReactNode } from "react";
+import { createContext, useState, ReactNode, useEffect } from "react";
 import { User } from "../Types/User";
 
 interface AuthContextType {
   user: User | null;
-  login: (user: User) => void;
+  login: (user: User, token: string) => void;
   logout: () => void;
   showLogin: boolean;
   showRegister: boolean;
@@ -19,12 +19,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
 
-  const login = (user: User) => {
+  useEffect(() => {
+    const storedToken = localStorage.getItem("authToken");
+    if (storedToken) {
+      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+      setUser(storedUser);
+    }
+  }, []);
+
+  const login = (user: User, token: string) => {
     setUser(user);
+    localStorage.setItem("authToken", token); 
+    localStorage.setItem("user", JSON.stringify(user));
     closeModals();
   };
 
-  const logout = () => setUser(null);
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("authToken"); 
+    localStorage.removeItem("user"); 
+  };
+
   const openLogin = () => setShowLogin(true);
   const openRegister = () => setShowRegister(true);
   const closeModals = () => {

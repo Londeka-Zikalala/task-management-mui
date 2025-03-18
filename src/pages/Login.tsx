@@ -5,7 +5,6 @@ import { User } from "../Types/User";
 import { AuthContext } from "../Context/AuthContext";
 import { useNavigate } from "react-router";
 
-
 const Login = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -14,15 +13,15 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post<User | null>("/api/login", { username, password });
-      if (response.data) {
-        login(response.data);
+      const response = await axios.post<{ user: User, token: string }>("/api/login", { username, password });
+      if (response.data && response.data.token) {
+        login(response.data.user, response.data.token); 
         navigate("/tasks");
       } else {
         alert("Invalid credentials, redirecting to register...");
         openRegister();
       }
-    } catch {
+    } catch (error) {
       alert("Login failed");
     }
   };
