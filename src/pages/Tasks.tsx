@@ -13,7 +13,12 @@ const Tasks = () => {
     if (!user) return;
     const fetchTasks = async () => {
       try {
-        const response = await axios.get<Task[]>(`https://task-management-nest.onrender.com/${user.id}/tasks`);
+        const response = await axios.get<Task[]>(`https://task-management-nest.onrender.com/${user.id}/tasks`, {
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+          },
+        });
         setTasks(response.data);
       } catch (error) {
         console.error("Error fetching tasks");
@@ -29,6 +34,11 @@ const Tasks = () => {
         description: newTask.description,
         due_date: new Date().toISOString(), 
         status: false,
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
       });
       if (response.data) {
         setTasks([...tasks, { ...newTask, id: response.data.id }]);

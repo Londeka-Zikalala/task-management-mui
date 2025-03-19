@@ -13,7 +13,12 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post<{ user: User, token: string }>("https://task-management-nest.onrender.com/login", { username, password });
+      const response = await axios.post<{ user: User, token: string }>("https://task-management-nest.onrender.com/login", { username, password }, {
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+      });
       if (response.data && response.data.token) {
         login(response.data.user, response.data.token); 
         navigate("/tasks");

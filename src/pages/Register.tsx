@@ -11,8 +11,14 @@ const Register = () => {
 
   const handleRegister = async () => {
     try {
-      const response = await axios.post<{ user: User, token: string }>("https://task-management-nest.onrender.com/register", { username, password });
+      const response = await axios.post<{ user: User, token: string }>("https://task-management-nest.onrender.com/register", { username, password }, {
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+      });
       if (response.data && response.data.token) {
+        console.log(response.data)
         login(response.data.user, response.data.token); 
         alert("Registration successful, logging in...");
       }
