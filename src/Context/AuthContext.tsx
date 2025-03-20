@@ -3,7 +3,7 @@ import { User } from "../Types/User";
 
 interface AuthContextType {
   user: User | null;
-  login: (user: User, token: string) => void;
+  login: (user: User, accessToken: string) => void;
   logout: () => void;
   showLogin: boolean;
   showRegister: boolean;
@@ -27,9 +27,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const login = (user: User, token: string) => {
+  const login = (user: User, accessToken: string) => {
     setUser(user);
-    localStorage.setItem("authToken", token); 
+    localStorage.setItem("authToken", accessToken); 
     localStorage.setItem("user", JSON.stringify(user));
     closeModals();
   };

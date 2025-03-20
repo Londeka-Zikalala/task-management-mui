@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { TextField, Button, Typography, Modal, Box } from "@mui/material";
-import axios from "axios";
+import api from "../api";
 import { User } from "../Types/User";
 import { AuthContext } from "../Context/AuthContext";
 import { useNavigate } from "react-router";
@@ -13,19 +13,23 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post<{ user: User, token: string }>("https://task-management-nest.onrender.com/login", { username, password }, {
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-      });
-      if (response.data && response.data.token) {
-        login(response.data.user, response.data.token); 
+      const response = await api.post<{username: string; sub: number; accessToken: string;}>("/login", { username, password });
+      console.log(response)
+      if (response.data && response.data.accessToken) {
+
+        const user: User = {
+          id: response.data.sub,     
+          username: response.data.username
+        }
+
+        login(user, response.data.accessToken); 
+
         navigate("/tasks");
       } else {
         alert("Invalid credentials, redirecting to register...");
         openRegister();
       }
+     
     } catch (error) {
       alert("Login failed");
     }

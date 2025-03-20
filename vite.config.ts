@@ -8,16 +8,5 @@ export default defineConfig({
   build: {
     outDir: 'dist', 
     sourcemap: false, 
-},
-// server: {
-//   https: true,
-//   proxy: {
-//     '/api': {
-//       target: 'https://task-management-nest.onrender.com', 
-//       changeOrigin: true, 
-//       secure: true, 
-//       rewrite: (path) => path.replace(/^\/api/, ''), 
-//     },
-//   },
-// },
+}
 })

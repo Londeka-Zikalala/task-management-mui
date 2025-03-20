@@ -1,22 +1,25 @@
 import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Container, Typography, List, ListItem, ListItemText, Grid2, Button, TextField } from "@mui/material";
-import axios from "axios";
+import api from "../api";
 import { Task } from "../Types/Task";
 import { AuthContext } from "../Context/AuthContext";
 
 const Tasks = () => {
-  const { user } = useContext(AuthContext)!;
+  const { user, logout } = useContext(AuthContext)!;
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState({ title: '', description: '' });
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!user) return;
     const fetchTasks = async () => {
       try {
-        const response = await axios.get<Task[]>(`https://task-management-nest.onrender.com/${user.id}/tasks`, {
+        const response = await api.get<Task[]>(`/${user.id}/tasks`, {
           headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("authToken")}`
           },
         });
         setTasks(response.data);
@@ -29,15 +32,16 @@ const Tasks = () => {
 
   const handleAddTask = async () => {
     try {
-      const response = await axios.post('https://task-management-nest.onrender.com/tasks/create', {
+      const response = await api.post('/tasks/create', {
         title: newTask.title,
         description: newTask.description,
-        due_date: new Date().toISOString(), 
+        due_date: new Date().toISOString(),
         status: false,
       }, {
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("authToken")}`
         },
       });
       if (response.data) {
@@ -51,16 +55,34 @@ const Tasks = () => {
 
   const handleDeleteTask = async (title: string) => {
     try {
-      await axios.delete('https://task-management-nest.onrender.com/tasks/delete', { data: { title } });
+      await api.delete('/tasks/delete', {
+        data: { title },
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("authToken")}`
+        },
+      });
       setTasks(tasks.filter(task => task.title !== title));
     } catch (error) {
       console.error("Error deleting task");
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login"); 
+  };
+
+
   return (
     <Container maxWidth="sm">
       <Typography variant="h4" gutterBottom>Tasks</Typography>
+
+      <Button variant="contained" color="secondary" onClick={handleLogout} style={{ marginBottom: "1rem" }}>
+        Logout
+      </Button>
+
       <Grid2 container spacing={2}>
         <Grid2 size={12}>
           <TextField

@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { TextField, Button, Typography, Modal, Box } from "@mui/material";
-import axios from "axios";
+import api from "../api";
 import { AuthContext } from "../Context/AuthContext";
 import { User } from "../Types/User";
 
@@ -11,15 +11,10 @@ const Register = () => {
 
   const handleRegister = async () => {
     try {
-      const response = await axios.post<{ user: User, token: string }>("https://task-management-nest.onrender.com/register", { username, password }, {
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-      });
-      if (response.data && response.data.token) {
+      const response = await api.post<{ user: User, accessToken: string }>("/register", { username, password });
+      if (response.data && response.data.accessToken) {
         console.log(response.data)
-        login(response.data.user, response.data.token); 
+        login(response.data.user, response.data.accessToken); 
         alert("Registration successful, logging in...");
       }
     } catch (error) {
