@@ -10,17 +10,21 @@ const Home = () => {
   const { openLogin, openRegister } = useContext(AuthContext)!;
 
   return (
+    <>
+    <Typography variant="h4" style={{textAlign:"center"}}>Welcome To Your Task Manager</Typography>
+
     <Container maxWidth="sm" style={{ 
       display: "flex", 
-      flexDirection: "column", 
+      flexDirection: "row", 
       alignItems: "center", 
       justifyContent: "center", 
-      height: "100vh" 
+      height: "auto",
+      marginBlock:"10%"
     }}>
-      <Typography variant="h4" style={{textAlign:"center"}}>Welcome To Your Task Manager</Typography>
       <Button variant="contained" color="primary" onClick={openLogin} style={{ marginRight: 10 }}>Login</Button>
       <Button variant="outlined" color="secondary" onClick={openRegister}>Register</Button>
     </Container>
+    </>
   );
 };
 

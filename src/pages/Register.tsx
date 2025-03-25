@@ -2,7 +2,6 @@ import { useState, useContext } from "react";
 import { TextField, Button, Typography, Modal, Box } from "@mui/material";
 import api from "../api";
 import { AuthContext } from "../Context/AuthContext";
-import { User } from "../Types/User";
 
 const Register = () => {
   const [username, setUsername] = useState<string>("");
@@ -11,11 +10,23 @@ const Register = () => {
 
   const handleRegister = async () => {
     try {
-      const response = await api.post<{ user: User, accessToken: string }>("/register", { username, password });
-      if (response.data && response.data.accessToken) {
-        console.log(response.data)
+      const response = await api.post<any>("/register", { username, password },
+        {
+          headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        }
+      }
+      );
+
+      if (response.data === "user registered") {
         login(response.data.user, response.data.accessToken); 
         alert("Registration successful, logging in...");
+        closeModals();
+        openLogin()
+      }
+      else {
+        alert("Registration failed: " + response.data);
       }
     } catch (error) {
       alert("Registration failed");
