@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {List, ListItem, ListItemText, Grid2, Button, TextField, AppBar, Toolbar, Checkbox, Box, Dialog, DialogActions, DialogContent, DialogTitle, Paper } from "@mui/material";
+import {List, ListItem, ListItemText, Grid2, Button, TextField, AppBar, Toolbar, Checkbox, Box, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Typography, Alert, Snackbar } from "@mui/material";
 import api from "../api";
 import { Task } from "../Types/Task";
 import { AuthContext } from "../Context/AuthContext";
@@ -11,11 +11,15 @@ const Tasks = () => {
   const [newTask, setNewTask] = useState({ title: '', description: '', due_date: '', status: false });
   const [openAddModal, setOpenAddModal] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [noTasksSnackbarOpen, setNoTasksSnackbarOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!user) return;
     const fetchTasks = async () => {
+      if(tasks.length === 0){
+
+      }
       try {
         const response = await api.get<Task[]>(`/${user.id}/tasks`, {
           headers: {
@@ -31,6 +35,14 @@ const Tasks = () => {
     };
     fetchTasks();
   }, [user]);
+
+  useEffect(() => {
+    if (tasks.length === 0) {
+      setNoTasksSnackbarOpen(true);
+    } else {
+      setNoTasksSnackbarOpen(false);
+    }
+  }, [tasks]);
 
   const handleAddTask = async () => {
 
@@ -130,7 +142,11 @@ const Tasks = () => {
    
     <>
     {/* Navigation bar */}
+    <Typography variant="h6" sx={{ fontWeight:"800", color: "#fff", mb: 1 }}>
+            Your Tasks
+          </Typography>
     <AppBar position="static" sx={{ backgroundColor: "#f57c00", boxShadow: "none", borderRadius: "0 0 16px 16px", mb: 4 }}>
+    
     <Toolbar>
       <Button color="inherit" onClick={() => setFilter("all")}>All Tasks</Button>
       <Button color="inherit" onClick={() => setFilter("due")}>Still Due</Button>
@@ -141,6 +157,16 @@ const Tasks = () => {
     </Toolbar>
   </AppBar>
   <Paper sx={{ p: 3, borderRadius: 3, backgroundColor: "#fff", boxShadow: "0 4px 8px rgba(0,0,0,0.1)" }}>
+  <Snackbar
+        open={noTasksSnackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setNoTasksSnackbarOpen(false)}
+        style={{ position: 'absolute', bottom: "45%", marginInline:"40%" }}
+      >
+        <Alert  onClose={() => setNoTasksSnackbarOpen(false)} severity="info" sx={{ width: '100%' }}>
+          You have no tasks, start adding!
+        </Alert>
+      </Snackbar>
       <Grid2 container spacing={2}>
         <Grid2 size={12}>
         <List>
