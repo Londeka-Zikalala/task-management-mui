@@ -195,7 +195,7 @@ const Tasks = () => {
                   {/* Checkbox for toggling status and delete button for each task */}
                   <Box sx={{ display: 'block', alignItems: 'center', mr: 2 }}>
 
-                    <Typography variant="body2" sx={{fontWeight:'500'}}>
+                    <Typography variant="body2" sx={{fontStyle:'500'}}>
                       {task.status ? "completed" : "Mark Complete"}
                     </Typography>
                     <Checkbox
