@@ -20,10 +20,10 @@ const Register = () => {
       );
 
       if (response.data === "user registered") {
-        login(response.data.user, response.data.accessToken); 
-        alert("Registration successful, logging in...");
+        alert("Registration successful, redirecting to login...");
         closeModals();
         openLogin()
+        login(response.data.user, response.data.accessToken); 
       }
       else {
         alert("Registration failed: " + response.data);
