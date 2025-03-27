@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {List, ListItem, ListItemText, Grid2, Button, TextField, AppBar, Toolbar, Checkbox, Box, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Typography, Alert, Snackbar } from "@mui/material";
+import { List, ListItem, ListItemText, Grid2, Button, TextField, AppBar, Toolbar, Checkbox, Box, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Typography, Alert, Snackbar } from "@mui/material";
 import api from "../api";
 import { Task } from "../Types/Task";
 import { AuthContext } from "../Context/AuthContext";
@@ -17,7 +17,7 @@ const Tasks = () => {
   useEffect(() => {
     if (!user) return;
     const fetchTasks = async () => {
-      if(tasks.length === 0){
+      if (tasks.length === 0) {
 
       }
       try {
@@ -66,7 +66,7 @@ const Tasks = () => {
       });
       if (response.data) {
         setTasks([...tasks, { ...newTask, id: response.data.id }]);
-        setNewTask({ title: '', description: '', due_date: '', status:false});
+        setNewTask({ title: '', description: '', due_date: '', status: false });
         setOpenAddModal(false);
       }
     } catch (error) {
@@ -74,12 +74,13 @@ const Tasks = () => {
     }
   };
 
-  const handleTaskStatus = async (task: Task) => { 
+  const handleTaskStatus = async (task: Task) => {
     try {
-     
+
       const response = await api.patch('/tasks/update', {
+        id: task.id,
         title: task.title,
-        status: !task.status, 
+        status: !task.status,
       }, {
         headers: {
           "Content-Type": "application/json",
@@ -99,23 +100,31 @@ const Tasks = () => {
   const handleDeleteTask = async (task: Task) => {
 
     if (!window.confirm(`Are you sure you want to delete the task "${task.title}"?`)) {
+      console.log(task)
       return;
     }
 
     try {
-      await api.delete('/tasks/delete', {
-        data: { id : task.id},
+      const response = await api.delete('/tasks/delete', {
+        data:{id:task.id},
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
           "Authorization": `Bearer ${localStorage.getItem("authToken")}`
         },
       });
-      setTasks(tasks.filter(t => t.id !== task.id));
+      if (response.data === 'Task deleted successfully!') {
+        setTasks(prevTasks => prevTasks.filter(t => t.id !== task.id));
+        alert('Task deleted!')
+      } else {
+        alert('Failed to Delete task')
+      }
     } catch (error) {
+      console.log(error)
       console.error("Error deleting task");
     }
   };
+
 
   const filteredTasks = tasks.filter(task => {
     if (filter === "completed") {
@@ -124,91 +133,97 @@ const Tasks = () => {
     if (filter === "due") {
       return task.status === false;
     }
-    return true; 
+    return true;
   });
 
   const handleLogout = () => {
-    if (window.confirm("Are you sure you want to logout?")){
+    if (window.confirm("Are you sure you want to logout?")) {
       logout();
-      navigate("/"); 
+      navigate("/");
     }
-   
+
   };
 
 
-  
+
 
   return (
-   
+
     <>
-    {/* Navigation bar */}
-    <Typography variant="h6" sx={{ fontWeight:"800", color: "#fff", mb: 1 }}>
-            Your Tasks
-          </Typography>
-    <AppBar position="static" sx={{ backgroundColor: "#f57c00", boxShadow: "none", borderRadius: "0 0 16px 16px", mb: 4 }}>
-    
-    <Toolbar>
-      <Button color="inherit" onClick={() => setFilter("all")}>All Tasks</Button>
-      <Button color="inherit" onClick={() => setFilter("due")}>Still Due</Button>
-      <Button color="inherit" onClick={() => setFilter("completed")}>Completed</Button>
-      <Button color="inherit" onClick={handleLogout} sx={{ marginLeft: "auto" }}>
-        Logout
-      </Button>
-    </Toolbar>
-  </AppBar>
-  <Paper sx={{ p: 3, borderRadius: 3, backgroundColor: "#fff", boxShadow: "0 4px 8px rgba(0,0,0,0.1)" }}>
-  <Snackbar
-        open={noTasksSnackbarOpen}
-        autoHideDuration={6000}
-        onClose={() => setNoTasksSnackbarOpen(false)}
-        style={{ position: 'absolute', bottom: "45%", marginInline:"40%" }}
-      >
-        <Alert  onClose={() => setNoTasksSnackbarOpen(false)} severity="info" sx={{ width: '100%' }}>
-          You have no tasks, start adding!
-        </Alert>
-      </Snackbar>
-      <Grid2 container spacing={2}>
-        <Grid2 size={12}>
-        <List>
-          {filteredTasks.map((task: Task) => (
-            <ListItem key={task.id} divider>
-              <ListItemText 
-                primary={task.title} 
-                secondary={
-                  <>
-                    {task.description}<br/>
-                    Due: {task.due_date && new Date(task.due_date).toLocaleDateString()}
-                  </>
-                } 
-              />
+      {/* Navigation bar */}
+      <Typography variant="h6" sx={{ fontWeight: "800", color: "#fff", mb: 1 }}>
+        Your Tasks
+      </Typography>
+      <AppBar position="static" sx={{ backgroundColor: "#f57c00", boxShadow: "none", borderRadius: "0 0 16px 16px", mb: 4 }}>
 
-              {/* Checkbox for toggling status and delete button for each task */}
-              <Checkbox 
-                checked={task.status} 
-                onChange={() => handleTaskStatus(task)} 
-                color="primary"
-              />
-
-              <Button 
-                variant="outlined" 
-                color="secondary" 
-                onClick={() => handleDeleteTask(task)}
-              >
-                Delete
-              </Button>
-            </ListItem>
-
-          ))}
-        </List>
-        </Grid2>
-      </Grid2>
-      </Paper>
-       {/* Add Task button to open modal */}
-      <Box sx={{ textAlign: 'center', mt: 2 }}>
-          <Button variant="contained" onClick={() => setOpenAddModal(true)}>
-            Add Task
+        <Toolbar>
+          <Button color="inherit" onClick={() => setFilter("all")}>All Tasks</Button>
+          <Button color="inherit" onClick={() => setFilter("due")}>Still Due</Button>
+          <Button color="inherit" onClick={() => setFilter("completed")}>Completed</Button>
+          <Button color="inherit" onClick={handleLogout} sx={{ marginLeft: "auto" }}>
+            Logout
           </Button>
-        </Box>
+        </Toolbar>
+      </AppBar>
+      <Paper sx={{ p: 3, borderRadius: 3, backgroundColor: "#fff", boxShadow: "0 4px 8px rgba(0,0,0,0.1)" }}>
+        <Snackbar
+          open={noTasksSnackbarOpen}
+          autoHideDuration={6000}
+          onClose={() => setNoTasksSnackbarOpen(false)}
+          style={{ position: 'absolute', bottom: "45%", marginInline: "40%" }}
+        >
+          <Alert onClose={() => setNoTasksSnackbarOpen(false)} severity="info" sx={{ width: '100%' }}>
+            You have no tasks, start adding!
+          </Alert>
+        </Snackbar>
+        <Grid2 container spacing={2}>
+          <Grid2 size={12}>
+            <List>
+              {filteredTasks.map((task: Task) => (
+                <ListItem key={task.id} divider>
+                  <ListItemText
+                    primary={task.title}
+                    secondary={
+                      <>
+                        {task.description}<br />
+                        Due: {task.due_date && new Date(task.due_date).toLocaleDateString()}
+                      </>
+                    }
+
+
+                  />
+                  {/* Checkbox for toggling status and delete button for each task */}
+                  <Box sx={{ display: 'block', alignItems: 'center', mr: 2 }}>
+
+                    <Typography variant="body2" sx={{fontWeight:'500'}}>
+                      {task.status ? "completed" : "Mark Complete"}
+                    </Typography>
+                    <Checkbox
+                      checked={task.status}
+                      onChange={() => handleTaskStatus(task)}
+                      color="primary"
+                    />
+                  </Box>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => handleDeleteTask(task)}
+                  >
+                    Delete
+                  </Button>
+                </ListItem>
+
+              ))}
+            </List>
+          </Grid2>
+        </Grid2>
+      </Paper>
+      {/* Add Task button to open modal */}
+      <Box sx={{ textAlign: 'center', mt: 2 }}>
+        <Button variant="contained" onClick={() => setOpenAddModal(true)}>
+          Add Task
+        </Button>
+      </Box>
 
       {/* Add Task Modal */}
       <Dialog open={openAddModal} onClose={() => setOpenAddModal(false)}>
